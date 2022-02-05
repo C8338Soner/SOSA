@@ -15,7 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from sosa.views import DirectMessageViews, CommentViews
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('comments/<str:pk>', CommentViews.as_view()),
+    path('dm/<str:recipient_id>/<str:sender_id>', DirectMessageViews.as_view()),
+    
 ]
