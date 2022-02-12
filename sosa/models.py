@@ -1,14 +1,9 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.fields.related import ForeignKey
+from post.models import Post
 
 
 # Create your models here.
-
-class Post(models.Model):
-    content = models.CharField(max_length=200, blank=True)
-
-
 class Comment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     post = models.ForeignKey(Post,on_delete=models.CASCADE)
