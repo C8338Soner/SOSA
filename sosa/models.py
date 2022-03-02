@@ -18,4 +18,4 @@ class DirectMessage(models.Model):
     time_stamp = models.DateTimeField(auto_now_add=True)
     
     def __str__(self):
-        return f'sender {self.sender} - recipient- message {self.message}'
+        return f'sender: {self.sender} -- recipient: {self.recipient} -- message: {self.message}'
