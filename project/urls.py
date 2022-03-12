@@ -22,5 +22,6 @@ urlpatterns = [
     path('post/', include("post.urls")),
     path('comments/<str:pk>', CommentViews.as_view()),
     path('dm/<str:recipient_id>/<str:sender_id>', DirectMessageViews.as_view()),
+    path('user/', include('user.urls')),
     
 ]
