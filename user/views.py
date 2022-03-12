@@ -17,6 +17,7 @@ from rest_framework.views import APIView
 
 class UserView(APIView):
   def get(self, request):
+    print(request)
     if request.user.is_staff:
         users=User.objects.all()
         serializer=PublicUserSerializer(users, many=True)
