@@ -10,7 +10,7 @@ class Post(models.Model):
   views=models.IntegerField(default=0)
   likes=models.ManyToManyField(User, blank=True)
   publisher = models.ForeignKey(User,on_delete=models.SET_DEFAULT, default="Deleted", related_name="userNpost")
-  status=models.CharField(max_length=30, choices=(("1","Draft"),("2","Published")),default=("1","Draft"))
+  status=models.CharField(max_length=30, choices=(("draft","Draft"),("published","Published")),default=("draft","Draft"))
 
   def __str__(self):
     return f"{self.title} -- id: {self.id}"
