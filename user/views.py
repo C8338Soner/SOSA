@@ -1,8 +1,4 @@
-# lets us import from parent dir
-import sys
-sys.path.append("D:\Developer\VS_Code\SOSA")
 from permissions import IsAddedByUser
-
 from user.models import User
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
