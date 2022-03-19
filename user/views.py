@@ -1,11 +1,9 @@
 # lets us import from parent dir
-import os, sys
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.append(parentdir)
-from SOSA.permissions import IsAddedByUser
-from user.models import User
+import sys
+sys.path.append("D:\Developer\VS_Code\SOSA")
+from permissions import IsAddedByUser
 
+from user.models import User
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializer import UserSerializer, PublicUserSerializer

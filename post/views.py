@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.views import APIView
 from .serializers import PostSerializer
 from .models import Post
+from user.models import User
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -35,6 +36,9 @@ class PostCRUD(APIView):
     # if draft doesn't belong to request.user
     if post.status == "draft" and request.user != post.publisher and not request.user.is_staff:
       return Response(status=status.HTTP_403_FORBIDDEN)
+    
+    # add post to user history
+    
     serializer=PostSerializer(post)
     return Response(serializer.data)
     

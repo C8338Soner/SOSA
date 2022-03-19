@@ -22,9 +22,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     #my app
-    'sosa',
-    'post',
     'user',
+    'post',
+    'sosa',
 ]
 
 MIDDLEWARE = [

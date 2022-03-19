@@ -1,15 +1,14 @@
 from django.db import models
-from user.models import User
+from django.apps import apps
 
-# Create your models here.
 class Post(models.Model):
   title=models.CharField(max_length=100)
   content=models.TextField(max_length=100000)
   image=models.URLField(blank=True, null=True, max_length=10000) 
   post_date=models.DateTimeField(auto_now_add=True)
   views=models.IntegerField(default=0)
-  likes=models.ManyToManyField(User, blank=True)
-  publisher = models.ForeignKey(User,on_delete=models.SET_DEFAULT, default="Deleted", related_name="userNpost")
+  likes=models.ManyToManyField('user.User', blank=True, related_name='post_likes')
+  publisher = models.ForeignKey('user.User',on_delete=models.SET_DEFAULT, default="Deleted", related_name='post_publisher')
   status=models.CharField(max_length=30, choices=(("draft","Draft"),("published","Published")),default=("draft","Draft"))
 
   def __str__(self):
