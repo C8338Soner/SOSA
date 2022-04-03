@@ -9,4 +9,4 @@ class PublicUserSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
  class Meta:
   model = User
-  include = '__all__'
+  fields = '__all__'

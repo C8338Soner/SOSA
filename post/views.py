@@ -36,14 +36,12 @@ class PostCRUD(APIView):
     if post.status == "draft" and request.user != post.publisher and not request.user.is_staff:
       return Response(status=status.HTTP_403_FORBIDDEN)
 
-    #increase view
     post.views=post.views+1
-    post.save()
 
-    # add post to user history
     if request.user.is_authenticated:
       request.user.history.add(post)
- 
+
+    post.save()
     serializer=PostSerializer(post)
     return Response(serializer.data)
     
@@ -66,27 +64,29 @@ class PostCRUD(APIView):
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 @api_view(['POST'])
-def get_object(self, pk):
-  return get_object_or_404(Post, pk=pk)
-
 def PostSave(request, pk):
   if request.method=='POST' and request.user.is_authenticated:
-    post = get_object(pk)
+    post = get_object_or_404(Post, pk=pk)
     try:
-      request.user.saved_posts.get(post)
+      request.user.saved_posts.get(id = post.id)
       request.user.saved_posts.remove(post)
-      return Response(data="Post Unsaved")
+      return Response(data={"message": "Post Unsaved"})
     except:
       request.user.saved_posts.add(post)
-      return Response(data="Post Saved")
+      return Response(data={"message": "Post Saved"})
+  else:
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
+@api_view(['POST'])
 def PostLike(request, pk):
   if request.method=='POST' and request.user.is_authenticated:
-    post = get_object(pk)
+    post = get_object_or_404(Post, pk=pk)
     try:
-      post.likes.get(request.user)
+      post.likes.get(id=request.user.id)
       post.likes.remove(request.user)
-      return Response(data="Like Removed")
+      return Response(data={"message": "Like Deleted"})
     except:
-      request.user.saved_posts.add(post)
-      return Response(data="Like Added")
+      post.likes.add(request.user)
+      return Response(data={"message": "Like Added"})
+  else:
+    return Response(status=status.HTTP_401_UNAUTHORIZED)

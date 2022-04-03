@@ -1,4 +1,3 @@
-from permissions import IsAddedByUser
 from user.models import User
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -8,13 +7,14 @@ from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.views import APIView
+from .permissions import IsAddedByUser
 
 class UserView(APIView):
   def get(self, request):
     if request.user.is_staff:
-        users=User.objects.all()
-        serializer=PublicUserSerializer(users, many=True)
-        return Response(serializer.data)
+      users=User.objects.all()
+      serializer=PublicUserSerializer(users, many=True)
+      return Response(serializer.data)
     return Response(status=status.HTTP_403_FORBIDDEN)
 
   def post(self,request):
