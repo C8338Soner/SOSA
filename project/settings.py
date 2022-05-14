@@ -22,9 +22,9 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'corsheaders',
     #my app
-    'sosa',
-    'post',
     'user',
+    'post',
+    'sosa',
 ]
 
 MIDDLEWARE = [
@@ -87,6 +87,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTH_USER_MODEL = "user.User"
 
 LANGUAGE_CODE = 'en-us'
 
@@ -105,8 +106,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
     ]
 

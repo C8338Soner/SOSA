@@ -1,19 +1,16 @@
-
-from rest_framework.authtoken.models import Token
-from django.contrib.auth.models import User
+from user.models import User
 from rest_framework import serializers
 
-
-class RegistrationSerializer(serializers.ModelSerializer):
+class PublicUserSerializer(serializers.ModelSerializer):
  class Meta:
   model = User
-  fields = ['username', 'email', 'password','first_name']
-  
+  exclude = ['password', 'first_name', 'last_name', 'last_login']
+
 class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id','username','first_name']
-        
+ class Meta:
+  model = User
+  fields = '__all__'
+  
 class TokenSerializer(serializers.ModelSerializer):
   class Meta:
     model = Token
