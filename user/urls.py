@@ -7,7 +7,6 @@ urlpatterns = [
  path('register/', UserView.as_view()),
  path('<int:pk>/', UserCRUD.as_view()),
  path('logout/', logout_view, name='logout'),
- path('allusers/', allUsers, name='allusers'),
  path('currentuser/<str:token>', currentUser, name='currentuser'),
  
 ]
