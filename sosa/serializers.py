@@ -1,6 +1,5 @@
-from rest_framework import serializers
 from .models import Comment, DirectMessage
-
+from rest_framework import serializers
 class CommentSerializer(serializers.ModelSerializer):
     user = serializers.StringRelatedField()
     user_id = serializers.IntegerField()

@@ -1,7 +1,7 @@
 from user.models import User
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializer import UserSerializer, PublicUserSerializer
+from .serializer import UserSerializer, PublicUserSerializer, TokenSerializer
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import make_password
 from django.shortcuts import get_object_or_404
@@ -42,6 +42,13 @@ def logout_view(request):
    'message': 'logout successful!'
   }
   return Response(data)
+
+@api_view(['GET'])
+def currentUser(request,token):
+  if request.method == 'GET':
+    user = Token.objects.filter(key=token)
+    serialzer = TokenSerializer(user,many=True)
+    return Response(serialzer.data)
 
 class UserCRUD(APIView):
   permission_classes = [IsAddedByUser]
