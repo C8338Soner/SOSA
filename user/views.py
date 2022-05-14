@@ -1,8 +1,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .serializer import RegistrationSerializer
+from .serializer import RegistrationSerializer , UserSerializer , TokenSerializer
 from rest_framework.authtoken.models import Token
 from django.contrib.auth.hashers import make_password
+from django.contrib.auth.models import User
 # Create your views here.
 @api_view(['POST'])
 def registration_view(request):
@@ -28,3 +29,18 @@ def logout_view(request):
   }
   
   return Response(data)
+@api_view(['GET'])
+def allUsers(request):
+    if request.method == 'GET':
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
+@api_view(['GET'])
+def currentuser(request,token):
+    if request.method == 'GET':
+        user = Token.objects.filter(key=token)
+        print(user)
+        serialzer = TokenSerializer(user,many=True)
+        return Response(serialzer.data)
+
