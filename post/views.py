@@ -18,18 +18,22 @@ class PostView(APIView):
 
   def post(self,request): 
     if request.user.is_authenticated:
-      #DATA 1 -> URLs
-      for i in list(request.data[1].values())[0]:
-        serializer = ImageSerializer(data={"URL": str(i)})
-        if serializer.is_valid(): serializer.save()
-        else: return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-      #DATA 0 -> Serializer
-      serializer = PostSerializer(data=request.data[0])
-      if serializer.is_valid():
-        serializer.save(publisher=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      #DATA 0 -> Post
+      post_serializer = PostSerializer(data=request.data[0])
+      if post_serializer.is_valid():
+        post_serializer.save(publisher=request.user)
+
+        #DATA 1 -> URLs
+        for i in request.data[1]:
+          serializer = ImageSerializer(data={"URL": str(i)})
+          if serializer.is_valid(): 
+            serializer.save()
+            Post.objects.get(pk=post_serializer.data['id']).images.add(serializer.data['id'])
+          else: return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        return Response(post_serializer.data, status=status.HTTP_201_CREATED)
+      return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
 class PostCRUD(APIView):
@@ -39,8 +43,6 @@ class PostCRUD(APIView):
 
   def get(self, request, pk):
     post=self.get_object(pk)
-    image = Image.objects.filter(id__in=post.images.all()) # use .all() to open QuerySet
-    images = list(map(lambda img: {f'img {img.id}': f'{img}'}, image))
 
     # if draft doesn't belong to request.user
     if post.status == "draft" and request.user != post.publisher and not request.user.is_staff:
@@ -52,7 +54,7 @@ class PostCRUD(APIView):
     post.save()
 
     serializer=PostSerializer(post)
-    return Response(data=[serializer.data, {"URLs": images}])
+    return Response(serializer.data)
 
   def put(self, request, pk):
     post=self.get_object(pk)
