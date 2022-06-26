@@ -1,8 +1,8 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
-from .serializers import PostSerializer
-from .models import Post
+from .serializers import PostSerializer, ImageSerializer
+from .models import Post, Image
 from rest_framework import status
 from rest_framework.response import Response
 
@@ -16,14 +16,28 @@ class PostView(APIView):
     serializer=PostSerializer(post, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-  def post(self,request):
+  def post(self,request): 
     if request.user.is_authenticated:
-      serializer = PostSerializer(data=request.data)
-      if serializer.is_valid():
-        serializer.save(publisher=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+      #DATA 0 -> Post
+      post_serializer = PostSerializer(data=request.data[0])
+      if post_serializer.is_valid():
+        post_serializer.save(publisher=request.user)
+
+        #DATA 1 -> URLs
+        for i in request.data[1]:
+          image_serializer = ImageSerializer(data={"URL": str(i)})
+          if image_serializer.is_valid(): 
+            image_serializer.save()
+            Post.objects.get(pk=post_serializer.data['id']).images.add(image_serializer.data['id'])
+          else: 
+            return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        post_serializer=PostSerializer(Post.objects.get(pk=post_serializer.data['id']))
+
+        return Response(post_serializer.data, status=status.HTTP_201_CREATED)
+      return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
+
 class PostCRUD(APIView):
 
   def get_object(self, pk):
@@ -37,14 +51,12 @@ class PostCRUD(APIView):
       return Response(status=status.HTTP_403_FORBIDDEN)
 
     post.views=post.views+1
-
     if request.user.is_authenticated:
       request.user.history.add(post)
-
     post.save()
+
     serializer=PostSerializer(post)
     return Response(serializer.data)
-    
 
   def put(self, request, pk):
     post=self.get_object(pk)

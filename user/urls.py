@@ -8,5 +8,4 @@ urlpatterns = [
  path('<int:pk>/', UserCRUD.as_view()),
  path('logout/', logout_view, name='logout'),
  path('currentuser/<str:token>', currentUser, name='currentuser'),
- 
 ]
