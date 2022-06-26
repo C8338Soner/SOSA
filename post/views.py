@@ -30,7 +30,8 @@ class PostView(APIView):
           if serializer.is_valid(): 
             serializer.save()
             Post.objects.get(pk=post_serializer.data['id']).images.add(serializer.data['id'])
-          else: return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+          else: 
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         return Response(post_serializer.data, status=status.HTTP_201_CREATED)
       return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
