@@ -26,12 +26,13 @@ class PostView(APIView):
 
         #DATA 1 -> URLs
         for i in request.data[1]:
-          serializer = ImageSerializer(data={"URL": str(i)})
-          if serializer.is_valid(): 
-            serializer.save()
-            Post.objects.get(pk=post_serializer.data['id']).images.add(serializer.data['id'])
+          image_serializer = ImageSerializer(data={"URL": str(i)})
+          if image_serializer.is_valid(): 
+            image_serializer.save()
+            Post.objects.get(pk=post_serializer.data['id']).images.add(image_serializer.data['id'])
           else: 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        post_serializer=PostSerializer(Post.objects.get(pk=post_serializer.data['id']))
 
         return Response(post_serializer.data, status=status.HTTP_201_CREATED)
       return Response(post_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
