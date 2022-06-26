@@ -6,6 +6,15 @@ from .models import Post, Image
 from rest_framework import status
 from rest_framework.response import Response
 
+def add_images(images, id):
+  for i in images:
+    image_serializer = ImageSerializer(data={"URL": str(i)})
+    if image_serializer.is_valid(): 
+      image_serializer.save()
+      Post.objects.get(pk=id).images.add(image_serializer.data['id'])
+    else: 
+      return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class PostView(APIView):
 
   def get(self, request):
@@ -24,14 +33,7 @@ class PostView(APIView):
       if post_serializer.is_valid():
         post_serializer.save(publisher=request.user)
 
-        #DATA 1 -> URLs
-        for i in request.data[1]:
-          image_serializer = ImageSerializer(data={"URL": str(i)})
-          if image_serializer.is_valid(): 
-            image_serializer.save()
-            Post.objects.get(pk=post_serializer.data['id']).images.add(image_serializer.data['id'])
-          else: 
-            return Response(image_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        add_images(images=request.data[1], id=post_serializer.data['id'])
         post_serializer=PostSerializer(Post.objects.get(pk=post_serializer.data['id']))
 
         return Response(post_serializer.data, status=status.HTTP_201_CREATED)
@@ -60,17 +62,22 @@ class PostCRUD(APIView):
 
   def put(self, request, pk):
     post=self.get_object(pk)
-    if request.user == post.publisher.id and request.user.is_authenticated or request.user.is_staff:
-      serializer=PostSerializer(instance=post, data=request.data)
+    if request.user == post.publisher.id or request.user.is_staff:
+      serializer=PostSerializer(instance=post, data=request.data[0])
       if serializer.is_valid():
         serializer.save()
+
+        Post.objects.get(pk=pk).images.clear()
+        add_images(images=request.data[1], id=serializer.data['id'])
+        serializer=PostSerializer(Post.objects.get(pk=pk))
+
         return Response(serializer.data, status=status.HTTP_201_CREATED)
       return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
 
   def delete(self, request, pk):
     post=self.get_object(pk)
-    if request.user == post.publisher.id and request.user.is_authenticated or request.user.is_staff:
+    if request.user == post.publisher.id or request.user.is_staff:
       post.delete()
       return Response(status=status.HTTP_404_NOT_FOUND)
     return Response(status=status.HTTP_401_UNAUTHORIZED)
@@ -86,8 +93,10 @@ def PostSave(request, pk):
     except:
       request.user.saved_posts.add(post)
       return Response(data={"message": "Post Saved"})
-  else:
+  elif request.method != 'POST': 
     return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
+  else:
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 def PostLike(request, pk):
@@ -100,5 +109,7 @@ def PostLike(request, pk):
     except:
       post.likes.add(request.user)
       return Response(data={"message": "Like Added"})
+  elif request.method != 'POST': 
+    return Response(status=status.HTTP_405_METHOD_NOT_ALLOWED)
   else:
-    return Response(status=status.HTTP_401_UNAUTHORIZED)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
