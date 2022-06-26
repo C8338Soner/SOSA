@@ -48,6 +48,7 @@ def currentUser(request,token):
   if request.method == 'GET':
     user = Token.objects.filter(key=token)
     serialzer = TokenSerializer(user,many=True)
+    print(serialzer.data)
     return Response(serialzer.data)
 
 class UserCRUD(APIView):
